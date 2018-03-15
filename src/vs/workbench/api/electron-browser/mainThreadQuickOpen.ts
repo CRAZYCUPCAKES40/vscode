@@ -7,6 +7,7 @@
 import { TPromise } from 'vs/base/common/winjs.base';
 import { asWinJsPromise } from 'vs/base/common/async';
 import { IQuickOpenService, IPickOptions, IInputOptions } from 'vs/platform/quickOpen/common/quickOpen';
+import { IQuickInputService } from 'vs/platform/quickinput/common/quickInput';
 import { InputBoxOptions } from 'vscode';
 import { ExtHostContext, MainThreadQuickOpenShape, ExtHostQuickOpenShape, MyQuickPickItems, MainContext, IExtHostContext } from '../node/extHost.protocol';
 import { extHostNamedCustomer } from 'vs/workbench/api/electron-browser/extHostCustomers';
@@ -23,7 +24,8 @@ export class MainThreadQuickOpen implements MainThreadQuickOpenShape {
 
 	constructor(
 		extHostContext: IExtHostContext,
-		@IQuickOpenService quickOpenService: IQuickOpenService
+		@IQuickOpenService quickOpenService: IQuickOpenService,
+		@IQuickInputService private _quickInputService: IQuickInputService
 	) {
 		this._proxy = extHostContext.getProxy(ExtHostContext.ExtHostQuickOpen);
 		this._quickOpenService = quickOpenService;
@@ -50,15 +52,17 @@ export class MainThreadQuickOpen implements MainThreadQuickOpenShape {
 			};
 		});
 
-		return asWinJsPromise(token => this._quickOpenService.pick(this._contents, options, token)).then(item => {
-			if (item) {
-				return item.handle;
-			}
-			return undefined;
-		}, undefined, progress => {
-			if (progress) {
-				this._proxy.$onItemSelected((<MyQuickPickItems>progress).handle);
-			}
+		return this._contents.then(contents => {
+			return asWinJsPromise(token => this._quickInputService.pick(contents)).then(item => {
+				if (item && item.length) {
+					return item[0].handle;
+				}
+				return undefined;
+			}, undefined, progress => {
+				if (progress) {
+					this._proxy.$onItemSelected((<MyQuickPickItems>progress).handle);
+				}
+			});
 		});
 	}
 

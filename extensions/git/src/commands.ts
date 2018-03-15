@@ -427,6 +427,69 @@ export class CommandCenter {
 
 	@command('git.init')
 	async init(): Promise<void> {
+		if (1) {
+			const item = await window.showQuickPick([
+				{
+					"label": "AI - E2E - Test",
+					"description": "50359d91-7b9d-4823-85af-eb298a61ba95",
+				},
+				{
+					"label": "ASR Canary Test Subscription 1",
+					"description": "605e5f88-99d5-4be1-965d-445852415039",
+				},
+				{
+					"label": "CodeMine-Prod",
+					"description": "dc4948fc-fa86-4bee-9410-c0891a1f62b0",
+				},
+				{
+					"label": "CSM Test Environment Services",
+					"description": "623d50f1-4fa8-4e46-a967-a9214aed43ab",
+				},
+				{
+					"label": "DevDiv Key Vault",
+					"description": "bd62906c-0a81-43c3-a2f8-126e4cf66ada",
+				},
+				{
+					"label": "DevDiv Test Labs",
+					"description": "4569f501-239f-4c48-a7c0-a3b1f507720c",
+				},
+				{
+					"label": "Monaco Development Subscription",
+					"description": "9b16b0df-65b6-46d3-b9c9-e4fbc86b1fa7",
+				},
+				{
+					"label": "PLAYGROUND - IbizaFx One",
+					"description": "0531c8c8-df32-4254-a717-b6e983273e5f",
+				},
+				{
+					"label": "Security Test Subscription B",
+					"description": "83135b45-d55c-419b-806d-9e5faa6c77ca",
+				},
+				{
+					"label": "Try Out Subscription",
+					"description": "22597fe7-6f99-41e2-a033-345a493ab393",
+				},
+				{
+					"label": "VS Code Setup, Update, and Build Services",
+					"description": "8afa857f-ba38-4efa-bd5b-41fc50ac5200",
+				},
+				{
+					"label": "VS Code Telemetry Subscription",
+					"description": "dec3cbaa-81bb-4ea0-8a37-e27a20ef4089",
+				},
+				{
+					"label": "VS Code Website",
+					"description": "11393685-9e2f-4e85-a14f-1f5fa7bbcf7d",
+				},
+				{
+					"label": "VS Telemetry - Data Catalog",
+					"description": "a7bb576c-291e-4553-965a-1c588b3f29d8",
+				}
+			]);
+			console.log(item);
+			return;
+		}
+
 		let path: string | undefined;
 
 		if (workspace.workspaceFolders && workspace.workspaceFolders.length > 1) {
