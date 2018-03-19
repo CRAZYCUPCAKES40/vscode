@@ -18,6 +18,7 @@ import { getCSSLanguageService, getSCSSLanguageService, getLESSLanguageService, 
 import { getLanguageModelCache } from './languageModelCache';
 import { formatError, runSafe } from './utils/errors';
 import uri from 'vscode-uri';
+import { FoldingProviderServerCapabilities, FoldingRangesRequest } from './protocol/foldingProvider.proposed';
 
 export interface Settings {
 	css: LanguageSettings;
@@ -74,7 +75,7 @@ connection.onInitialize((params: InitializeParams): InitializeResult => {
 	}
 	let snippetSupport = hasClientCapability('textDocument.completion.completionItem.snippetSupport');
 	scopedSettingsSupport = hasClientCapability('workspace.configuration');
-	let capabilities: ServerCapabilities & CPServerCapabilities = {
+	let capabilities: ServerCapabilities & CPServerCapabilities & FoldingProviderServerCapabilities = {
 		// Tell the client that the server works in FULL text document sync mode
 		textDocumentSync: documents.syncKind,
 		completionProvider: snippetSupport ? { resolveProvider: false } : undefined,
@@ -85,7 +86,8 @@ connection.onInitialize((params: InitializeParams): InitializeResult => {
 		documentHighlightProvider: true,
 		codeActionProvider: true,
 		renameProvider: true,
-		colorProvider: true
+		colorProvider: true,
+		foldingProvider: true
 	};
 	return { capabilities };
 });
@@ -264,6 +266,14 @@ connection.onRenameRequest(renameParameters => {
 		let stylesheet = stylesheets.get(document);
 		return getLanguageService(document).doRename(document, renameParameters.position, renameParameters.newName, stylesheet);
 	}, null, `Error while computing renames for ${renameParameters.textDocument.uri}`);
+});
+
+connection.onRequest(FoldingRangesRequest.type, (params, token) => {
+	return runSafe(() => {
+		let document = documents.get(params[0].textDocument.uri);
+		let stylesheet = stylesheets.get(document);
+		return getLanguageService(document).findFoldingRegions(document, stylesheet);
+	}, null, `Error while computing folding ranges for ${params[0].textDocument.uri}`);
 });
 
 // Listen on the connection
